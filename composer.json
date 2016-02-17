@@ -1,5 +1,5 @@
 {
-	"name": "HydraWiki/lessoid",
+	"name": "hydrawiki/lessoid",
 	"description": "A very beta replacement to MediaWiki's LESS implamentation",
 	"keywords": [ "less", "css", "php", "stylesheet", "less.js", "lesscss" ],
 	"homepage": "https://github.com/HydraWiki/lessoid",
