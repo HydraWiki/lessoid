@@ -14,7 +14,7 @@ But for real, in this repo (services/lessoid) you will find a lessoid.js file. T
 Also, don't move the services folder from here, as the code will fallback to parsing less over the command line if the Lessoid service is not running. It does this through the less.js-hydra (less.js, modified for our uses) library, so if its moved.. no fallback processing and everything blows up.
 
 ## How to use
-We will get back to you on that.
+We will get back to you on that. - For right now, don't.
 
 ## Current Status
 Probably broken. Seriously, don't use this unless you are comfortable with tinkering. This should is no way be considered ready for live.
