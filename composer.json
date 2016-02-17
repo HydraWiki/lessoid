@@ -1,0 +1,19 @@
+{
+	"name": "HydraWiki/lessoid",
+	"description": "A very beta replacement to MediaWiki's LESS implamentation",
+	"keywords": [ "less", "css", "php", "stylesheet", "less.js", "lesscss" ],
+	"homepage": "https://github.com/HydraWiki/lessoid",
+	"license": "Apache-2.0",
+	"authors": [
+		{
+			"name": "Hydra Platform Team",
+			"homepage": "https://github.com/HydraWiki"
+		}
+	],
+	"require": {
+		"PHP" : ">=5.3"
+	},
+	"autoload": {
+		"psr-0": { "Less": "lib" }
+	}
+}
