@@ -101,7 +101,7 @@ class Less_Parser{
 
 
 		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
-		$exec = $cliPath."lessc";
+		$exec = $cliPath."/lessc";
 
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			$paths = implode(":",array_reverse(array_keys(self::$options['import_dirs'])));
