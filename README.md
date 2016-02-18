@@ -20,3 +20,6 @@ We will get back to you on that. - For right now, don't.
 Probably broken. Seriously, don't use this unless you are comfortable with tinkering. This should is no way be considered ready for live.
 
 It is currently a really dirty shim around the default Less_Parser class from less.php designed to trick MediaWiki into using it instead of less.php.
+
+## Other Notes
+We are currently using a modified version off the less.js node package. In the future we can hopefully use the official and have it upgradeable.
