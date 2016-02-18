@@ -78,7 +78,6 @@ class Less_Parser{
 	    curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
 		$return = curl_exec($ch);
 		curl_close($ch);
-
 		$json = json_decode($return,1);
 		if ($json) {
 			return $json;
@@ -146,8 +145,6 @@ class Less_Parser{
 		} else {
 			return ["message"=>"Failed to start CLI lessc"];
 		}
-
-		return $exec;
 	}
 
 	/**
@@ -194,7 +191,7 @@ class Less_Parser{
 
 		if (!isset($parsed['css'])) {
 			// we didn't get CSS back.
-			$errmsg = isset($parsed['message']) ? $parsed['message'] : "Unknown Error";
+			$errmsg = isset($parsed['message']) ? $parsed['message'] : "Unknown Error.";
 			$this->cssBuffer .= "\n/* No CSS Returned from REST Decoding! \n $errmsg */\n";
 
 			// Lets fallback to the CLI, the service may be down.

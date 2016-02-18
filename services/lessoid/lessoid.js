@@ -185,7 +185,7 @@ server.post('/parse', function (req, res, next) {
 
         doRender(p.less,options,function(output){
             logger("===Rendered Output===\n"+output.css+"\n================\n",'renderer');
-            res.send(output);
+            res.send(JSON.stringify(output));
             cache.set(p.key,output,true,function(){
                 return next();
             });
