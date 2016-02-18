@@ -45,6 +45,7 @@ function CacheStore(){
     this.debug = function(msg) {
         logger(msg,"cache");
     }
+    this.useRedis = true;
     /**
      * Check if key exists
      * @param  {[type]} key [description]
@@ -65,17 +66,26 @@ function CacheStore(){
             return;
         }
         this.debug("Object doesn't exist in local cache.");
-        redis.get(key, function (err, data) {
-            if (err || data == null) {
-                this.debug("Object doesn't exist in redis.");
-                callback(false);
-            } else {
-                this.debug("Object returned from redis and set local.");
-                this.set(key,data,false,function(){
-                    callback(data);
-                });
-            }
-        }.bind(this));
+        if (this.useRedis == true) {
+            redis.get(key, function (err, data) {
+
+                if (err || data == null) {
+                    this.debug("Object doesn't exist in redis.");
+                    callback(false);
+                } else {
+                    if (typeof data == "string") {
+                        data = JSON.parse(data);
+                    }
+                    this.debug("Object returned from redis and set local.");
+                    this.set(key,data,false,function(){
+                        callback(data);
+                    });
+                }
+            }.bind(this));
+        } else {
+            this.debug("Redis disabled. Not checking Redis.");
+            callback(false);
+        }
         return;
     };
     /**
@@ -84,8 +94,8 @@ function CacheStore(){
      * @param  mixed  data data to store in
      * @return nothing
      */
-    this.set = function(key,data,redis,callback){
-        redis = redis | true;
+    this.set = function(key,data,setRedis,callback){
+        setRedis = setRedis| true;
         if (typeof callback != 'function') {
             callback = function(){};
         }
@@ -94,7 +104,10 @@ function CacheStore(){
             'data': data,
             'time': Math.floor(Date.now() / 1000)
         };
-        if (redis) {
+        if (setRedis && this.useRedis) {
+            if (typeof data == "object") {
+                data = JSON.stringify(data); 
+            }
             this.debug("Setting object in redis cache");
             redis.set(key,data,callback);
         } else {
@@ -113,7 +126,9 @@ function CacheStore(){
             var age = current - this.store[x].time;
             if (age > this.cacheLife) {
                 delete this.store[x];
-                redis.del(x);
+                if (this.useRedis) {
+                    redis.del(x);
+                }
                 logger('removing item from cache','cache');
             }
         }
@@ -121,6 +136,7 @@ function CacheStore(){
 };
 
 cache = new CacheStore();
+cache.useRedis = true;
 
 setInterval(function(){
     cache.purgeExpiredLocal();
@@ -171,9 +187,9 @@ server.post('/parse', function (req, res, next) {
 
     cache.get(p.key, function (cachedReturn){
 
-
         if(cachedReturn) {
-            res.send(cachedReturn);
+            console.log(typeof cachedReturn);
+            res.json(cachedReturn);
             return next();
         }
 
@@ -184,8 +200,8 @@ server.post('/parse', function (req, res, next) {
         }
 
         doRender(p.less,options,function(output){
-            logger("===Rendered Output===\n"+output.css+"\n================\n",'renderer');
-            res.send(JSON.stringify(output));
+
+            res.json(output);
             cache.set(p.key,output,true,function(){
                 return next();
             });
