@@ -1,4 +1,4 @@
-var less = require('./less.js-hydra/index.js');
+var less = require('./less-hydra/index.js');
 var restify = require('restify');
 var pjson = require('./package.json');
 var util = require("util");
@@ -184,6 +184,7 @@ server.post('/parse', function (req, res, next) {
         }
 
         doRender(p.less,options,function(output){
+            logger("===Rendered Output===\n"+output.css+"\n================\n",'renderer');
             res.send(output);
             cache.set(p.key,output,true,function(){
                 return next();

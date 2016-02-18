@@ -10,8 +10,8 @@
   "license": "Unknown",
   "dependencies" :
   {
-      "less" : "2.6.x",
-      "restify" : "4.0.x"
+      "restify" : "4.0.x",
+      "redis": "2.4.x"
   }
 
 }
