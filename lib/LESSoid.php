@@ -25,18 +25,20 @@ class Less_Parser{
 		'plugins'				=> array(),
 	);
 	public static $options = array();
-	private $env; // this handles some defaults or something...
 	public $cssBuffer = "";
-	public $input; // not using it, fam.
-	/*
-		Basic Setup Stuff that MEdiaWiki is calling and we need to leave in place.
-	 */
 
-	public function __construct( $env = null ){
+	/**
+	 * Setup Constructor
+	 */
+	 public function __construct( ){
 		$this->SetOptions(Less_Parser::$default_options);
-		$this->Reset( $env );
+		$this->Reset( null );
 	}
 
+	/**
+	 * Reset Options to Default
+	 * @param $options
+	 */
 	public function Reset( $options = null ){
 		$this->rules = array();
 
@@ -46,9 +48,13 @@ class Less_Parser{
 		}
 	}
 
+	/**
+	 * Use REST call to LESSoid to parse less
+	 * @param  string $str
+	 * @param  string $uriRoot
+	 * @return array
+	 */
 	public function parseCallREST($str, $uriRoot) {
-
-
 		$request = [
 			"options" => [],
 			"less" => $str,
@@ -79,23 +85,25 @@ class Less_Parser{
 		} else {
 			return ["message" => "Response was not JSON","response" => $return];
 		}
-
-
 	}
 
 	/**
-	 * [parseCLI description]
-	 * @param  [type] $str     [description]
-	 * @param  [type] $uriRoot [description]
-	 * @return [type]          [description]
+	 * Use the CLI to parse less
+	 * @param  string $str
+	 * @param  string $uriRoot
+	 * @return array
 	 */
 	public function parseCLI($str, $uriRoot) {
-
-
-
-
 		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
 		$exec = $cliPath."/lessc";
+
+		if (!file_exists($exec)) {
+			return ["message"=>"Couldn't find lessc at $exec"];
+		}
+
+		if (!is_executable($exec)) {
+			return ["message"=>"Lessc exists, but is not executable. Please fix your permissions."];
+		}
 
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			$paths = implode(":",array_reverse(array_keys(self::$options['import_dirs'])));
@@ -143,10 +151,10 @@ class Less_Parser{
 	}
 
 	/**
-	 * [parse description]
-	 * @param  [type] $str      [description]
-	 * @param  string $fileUri [description]
-	 * @return [type]           [description]
+	 * Parse a LESS string to CSS
+	 * @param  string $str
+	 * @param  string $fileUri
+	 * @return string
 	 */
 	public function parse( $str, $fileUri = '' ){
 		// Default handling that was already hear...
@@ -237,18 +245,12 @@ class Less_Parser{
 		return $this;
 	}
 
-
-
+	/**
+	 * Get the CSS buffer
+	 * @return string $cssBuffer
+	 */
 	public function getCss() {
 		return $this->cssBuffer;
-	}
-
-
-	/*
-		Here's some more stuff MediaWiki is gonna call... and may end up being
-	 */
-	static function AllParsedFiles(){
-		return [];
 	}
 
 	/**
@@ -265,13 +267,16 @@ class Less_Parser{
 		return $this;
 	}
 
+	/**
+	 * [WinPath description]
+	 * @param [type] $path [description]
+	 */
 	public static function WinPath($path){
 		return str_replace('\\', '/', $path);
 	}
 
 	/**
 	 * Set a list of directories or callbacks the parser should use for determining import paths
-	 *
 	 * @param array $dirs
 	 */
 	public function SetImportDirs( $dirs ){
@@ -291,12 +296,21 @@ class Less_Parser{
 		}
 	}
 
+	/**
+	 * Set Multiple Options
+	 * @param array $options
+	 */
 	public function SetOptions( $options ){
 		foreach($options as $option => $value){
 			$this->SetOption($option,$value);
 		}
 	}
 
+	/**
+	 * Set Option
+	 * @param string $option
+	 * @param string $value
+	 */
 	public function SetOption($option,$value){
 		switch($option){
 			case 'import_dirs':
@@ -306,21 +320,25 @@ class Less_Parser{
 		Less_Parser::$options[$option] = $value;
 	}
 
-	public function SetCacheDir( $dir ){
-
-		if( !file_exists($dir) ){
-			if( mkdir($dir) ){
-				return true;
-			}
-			throw new Exception('LESSoid cache directory couldn\'t be created: '.$dir);
-		} elseif ( !is_dir($dir) ) {
-			throw new Exception('LESSoid cache directory doesn\'t exist: '.$dir);
-		} elseif( !is_writable($dir) ) {
-			throw new Exception('LESSoid cache directory isn\'t writable: '.$dir);
-		} else {
-			$dir = self::WinPath($dir);
-			Less_Parser::$options['cache_dir'] = Less_Cache::$cache_dir;
-			return true;
-		}
+	/**
+	 * Catch any calls to this class that are not implamented
+	 * @param  $name      call name
+	 * @param  $arguments call arguments
+	 * @return nothing
+	 */
+	public function __call($name, $arguments) {
+	  	return;
 	}
+
+	/**
+	 * Catch any static calls to this class that are not implamented
+	 * @param  $name      call name
+	 * @param  $arguments call arguments
+	 * @return nothing
+	 */
+	public static function __callStatic($name, $arguments) {
+		return;
+	}
+
+
 }
