@@ -2,7 +2,7 @@
 /**
  *  RESToid shim based around MediaWiki's calling of Less_Parser
  */
-class Less_Parser{
+class Less_Parser {
 
 	public static $default_options = array(
 		'compress'				=> false,			// option - whether to compress
@@ -87,7 +87,7 @@ class Less_Parser{
 		if ($json) {
 			return $json;
 		} else {
-			return ["message" => "Response was not JSON","response" => $return];
+			return ["message" => "Response was not JSON", "response" => $return];
 		}
 	}
 
