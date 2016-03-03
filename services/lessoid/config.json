@@ -1,0 +1,15 @@
+{
+    "useLocalCache": true,
+    "useRedis" : false,
+    "redis": {
+        "host": "redis103a-dev",
+        "port": 6379,
+        "prefix": "HydraLESSoid"
+    },
+    "workers": 4,
+    "displayLogging": false,
+    "cache": {
+        "life": 3600,
+        "purgeInterval": 300
+    }
+}

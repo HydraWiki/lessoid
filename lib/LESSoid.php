@@ -30,19 +30,19 @@ class Less_Parser{
 	/**
 	 * Setup Constructor
 	 */
-	 public function __construct( ){
+	 public function __construct() {
 		$this->SetOptions(Less_Parser::$default_options);
-		$this->Reset( null );
+		$this->Reset(null);
 	}
 
 	/**
 	 * Reset Options to Default
 	 * @param $options
 	 */
-	public function Reset( $options = null ){
+	public function Reset($options = null) {
 		$this->rules = array();
 
-		if( is_array($options) ){
+		if (is_array($options)) {
 			$this->SetOptions(Less_Parser::$default_options);
 			$this->SetOptions($options);
 		}
@@ -55,6 +55,9 @@ class Less_Parser{
 	 * @return array
 	 */
 	public function parseCallREST($str, $uriRoot) {
+
+		$lessoidServer = $wgServer ? $wgServer : "http://localhost";
+
 		$request = [
 			"options" => [],
 			"less" => $str,
@@ -74,7 +77,7 @@ class Less_Parser{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	    curl_setopt($ch, CURLOPT_POST, 1);
-	    curl_setopt($ch, CURLOPT_URL, $wgServer.":8099/parse");
+	    curl_setopt($ch, CURLOPT_URL, $lessoidServer.":8099/parse");
 	    curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
 		$return = curl_exec($ch);
 		curl_close($ch);
@@ -122,23 +125,23 @@ class Less_Parser{
 		   2 => array("pipe", "w"),
 		);
 
-		$process = proc_open($exec, $descriptorspec, $pipes, $uriRoot, array( 'PATH' => '/usr/local/bin/' ));
+		$process = proc_open($exec, $descriptorspec, $pipes, $uriRoot, array('PATH' => '/usr/local/bin/'));
 		if (is_resource($process)) {
 
 			/* write LESS */
-			fwrite( $pipes[0], $str);
-			fclose( $pipes[0] );
+			fwrite($pipes[0], $str);
+			fclose($pipes[0]);
 
 			/* read compiled css */
-			$css = stream_get_contents( $pipes[1] );
-			fclose( $pipes[1] );
+			$css = stream_get_contents($pipes[1]);
+			fclose($pipes[1]);
 
 			/* check for errors */
-			if( $stderr = stream_get_contents( $pipes[2] ) ) {
+			if ($stderr = stream_get_contents($pipes[2])) {
 			    return ["message"=>$stderr];
 			}
-			fclose( $pipes[2] );
-			proc_close( $process );
+			fclose($pipes[2]);
+			proc_close($process);
 
 			if (!strlen($css)) {
 				return ["message"=>"No CSS Returned from lessc."];
@@ -156,13 +159,13 @@ class Less_Parser{
 	 * @param  string $fileUri
 	 * @return string
 	 */
-	public function parse( $str, $fileUri = '' ){
+	public function parse($str, $fileUri = '') {
 		// Default handling that was already hear...
 		// gonna just leave it?
-		if( !$fileUri ){
+		if (!$fileUri) {
 			$uriRoot = '';
 			$filename = 'anonymous-file-'.Less_Parser::$next_id++.'.less';
-		}else{
+		} else {
 			$fileUri = self::WinPath($fileUri);
 			$filename = $fileUri;
 			$uriRoot = dirname($fileUri);
@@ -173,7 +176,7 @@ class Less_Parser{
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			foreach (self::$options['import_dirs'] as $path => $v) {
 				$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-				foreach($objects as $name => $object){
+				foreach($objects as $name => $object) {
 					if ($object->isDir() && !in_array(basename($name), ['.','..'])) {
 				    	self::$options['import_dirs'][$name."/"] = "";
 					}
@@ -225,14 +228,14 @@ class Less_Parser{
 	 * @param bool $returnRoot Indicates whether the return value should be a css string a root node
 	 * @return Less_Parser
 	 */
-	public function parseFile( $filename, $uriRoot = '', $returnRoot = false){
+	public function parseFile($filename, $uriRoot = '', $returnRoot = false) {
 		// All this stuff was happening in the original.
 		// Maybe it should still happen in ours?
-		if( !file_exists($filename) ){
+		if (!file_exists($filename)) {
 			throw new Exception(sprintf('File `%s` not found.', $filename));
 		}
 
-		if( !$returnRoot && !empty($uriRoot) && basename($uriRoot) == basename($filename) ){
+		if (!$returnRoot && !empty($uriRoot) && basename($uriRoot) == basename($filename)) {
 			$uriRoot = dirname($uriRoot);
 		}
 
@@ -258,9 +261,9 @@ class Less_Parser{
 	 * @param array $vars
 	 * @return Less_Parser
 	 */
-	public function ModifyVars( $vars ){
+	public function ModifyVars($vars) {
 		$s = '';
-		foreach($vars as $name => $value){
+		foreach($vars as $name => $value) {
 			$s .= (($name[0] === '@') ? '' : '@') . $name .': '. $value . ((substr($value,-1) === ';') ? '' : ';');
 		}
 		$this->input = $s;
@@ -271,7 +274,7 @@ class Less_Parser{
 	 * [WinPath description]
 	 * @param [type] $path [description]
 	 */
-	public static function WinPath($path){
+	public static function WinPath($path) {
 		return str_replace('\\', '/', $path);
 	}
 
@@ -279,16 +282,16 @@ class Less_Parser{
 	 * Set a list of directories or callbacks the parser should use for determining import paths
 	 * @param array $dirs
 	 */
-	public function SetImportDirs( $dirs ){
+	public function SetImportDirs($dirs) {
 		Less_Parser::$options['import_dirs'] = array();
-		foreach($dirs as $path => $uriRoot){
+		foreach($dirs as $path => $uriRoot) {
 			$path = self::WinPath($path);
-			if( !empty($path) ){
+			if (!empty($path)) {
 				$path = rtrim($path,'/').'/';
 			}
-			if ( !is_callable($uriRoot) ){
+			if (!is_callable($uriRoot)) {
 				$uriRoot = self::WinPath($uriRoot);
-				if( !empty($uriRoot) ){
+				if (!empty($uriRoot)) {
 					$uriRoot = rtrim($uriRoot,'/').'/';
 				}
 			}
@@ -300,8 +303,8 @@ class Less_Parser{
 	 * Set Multiple Options
 	 * @param array $options
 	 */
-	public function SetOptions( $options ){
-		foreach($options as $option => $value){
+	public function SetOptions($options) {
+		foreach($options as $option => $value) {
 			$this->SetOption($option,$value);
 		}
 	}
@@ -311,13 +314,23 @@ class Less_Parser{
 	 * @param string $option
 	 * @param string $value
 	 */
-	public function SetOption($option,$value){
-		switch($option){
+	public function SetOption($option,$value) {
+		switch($option) {
 			case 'import_dirs':
 				$this->SetImportDirs($value);
 			return;
 		}
 		Less_Parser::$options[$option] = $value;
+	}
+
+	/**
+	 * Shim to feed back empty array.
+	 * No actual idea what mediawiki is doing with this file list, but it doesn't need it
+	 * as far as im concerned. Tho when code expects arrays, give it arrays.
+	 * @return array [an empty one!]
+	 */
+	public function AllParsedFiles() {
+		return [];
 	}
 
 	/**
