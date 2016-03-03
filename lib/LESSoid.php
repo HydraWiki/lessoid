@@ -26,6 +26,7 @@ class Less_Parser{
 	);
 	public static $options = array();
 	public $cssBuffer = "";
+	public $preBuffer = "";
 
 	/**
 	 * Setup Constructor
@@ -189,6 +190,9 @@ class Less_Parser{
 			self::$options['import_dirs'][$uriRoot] = "";
 		}
 
+		// Prepend string with preBuffer, for use with ModifyVars, ect.
+		$str = $this->preBuffer."\n\n".$str;
+
 		$time_start = microtime(true);
 		$this->cssBuffer = "/* === Start ".basename($filename)." === */\n";
 
@@ -266,7 +270,7 @@ class Less_Parser{
 		foreach($vars as $name => $value) {
 			$s .= (($name[0] === '@') ? '' : '@') . $name .': '. $value . ((substr($value,-1) === ';') ? '' : ';');
 		}
-		$this->input = $s;
+		$this->preBuffer = $s;
 		return $this;
 	}
 
