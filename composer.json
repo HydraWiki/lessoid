@@ -11,7 +11,7 @@
 		}
 	],
 	"require": {
-		"PHP" : ">=5.3"
+		"PHP" : ">=5.4"
 	},
 	"autoload": {
 		"psr-0": { "Less": "lib" }

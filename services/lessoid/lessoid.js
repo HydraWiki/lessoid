@@ -5,13 +5,28 @@ var util = require("util");
 const config = require('./config.json');
 const cluster = require('cluster');
 
+logger = function(msg,type) {
+    if (typeof type == "string") {
+        msg = "["+type+"] "+msg;
+    } else {
+        msg = "[LESSoid] "+msg;
+    }
+
+    var date = new Date();
+    msg = "["+date.toUTCString()+"] "+msg;
+
+    if (config.displayLogging) {
+        console.log(msg);
+    }
+}
+
 if (cluster.isMaster) {
     for (var i = 0; i < config.workers; i++) {
         cluster.fork();
     }
 
     cluster.on('exit', (worker, code, signal) => {
-        console.log(`worker ${worker.process.pid} died`);
+        logger('worker '+worker.process.pid+' died','cluster');
     });
 } else {
     var Redis = require("redis");
@@ -24,24 +39,11 @@ if (cluster.isMaster) {
         });
 
         redis.on("error", function (err) {
-            console.log("[redis] " + err);
+            logger(err,"redis");
         });
     }
 
-    logger = function(msg,type) {
-        if (typeof type == "string") {
-            msg = "["+type+"] "+msg;
-        } else {
-            msg = "[LESSoid] "+msg;
-        }
 
-        var date = new Date();
-        msg = "["+date.toUTCString()+"] "+msg;
-
-        if (config.displayLogging) {
-            console.log(msg);
-        }
-    }
 
     /**
      * Cache Store that uses redis to share data between nodes, and also keeps it own local records.
@@ -204,7 +206,6 @@ if (cluster.isMaster) {
         cache.get(p.key, function (cachedReturn){
 
             if(cachedReturn) {
-                console.log(typeof cachedReturn);
                 res.json(cachedReturn);
                 return next();
             }
