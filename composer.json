@@ -1,6 +1,6 @@
 {
 	"name": "hydrawiki/lessoid",
-	"description": "A very beta replacement to MediaWiki's LESS implamentation",
+	"description": "A persistent Less.js RESTful API parser service using Node.js.",
 	"keywords": [ "less", "css", "php", "stylesheet", "less.js", "lesscss" ],
 	"homepage": "https://github.com/HydraWiki/lessoid",
 	"license": "Apache-2.0",
@@ -15,5 +15,6 @@
 	},
 	"autoload": {
 		"psr-0": { "Less": "lib" }
-	}
+	},
+	"bin": ["services/lessoid/less-hydra/bin"]
 }

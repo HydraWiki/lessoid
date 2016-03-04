@@ -2,9 +2,9 @@
     "useLocalCache": true,
     "useRedis" : false,
     "redis": {
-        "host": "redis103a-dev",
+        "host": "localhost",
         "port": 6379,
-        "prefix": "HydraLESSoid"
+        "prefix": ""
     },
     "workers": 4,
     "displayLogging": false,
