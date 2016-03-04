@@ -41,4 +41,4 @@ This is alpha level code and the first target is to work seamlessly with MediaWi
 It is currently a really dirty shim around the default Less_Parser class from less.php designed to trick MediaWiki into using it instead of less.php.
 
 ## Other Notes
-We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environemtn.  In the future we plan to eliminate this modification and have it user upgradeable through composer.
+We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through composer.
