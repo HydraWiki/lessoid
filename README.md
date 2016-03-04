@@ -1,5 +1,5 @@
 # LESSoid
-A LESS parser running as a Node.js RESTful API and implements the [official Less.js package][lessmodified].  It is intended as a replacement for the oyejorge/less.php package and works as a drop in replacement for MediaWiki.  It can be used for other projects.
+A LESS parser running as a Node.js RESTful API and implements the official Less.js package.(See notes below.)  It is intended as a replacement for the oyejorge/less.php package and works as a drop in replacement for MediaWiki.  It can be used for other projects.
 
 ## Why LESSoid?
 In the Hydra Wiki Farm, the default LESS.php parser doesn't play well with caching across shared file systems such as gluster and relies on slow file caching techniques.  This Node.js solution uses an in-memory cache and can share the cache to multiple web nodes using Redis.
@@ -33,7 +33,7 @@ Installation through composer into your project:
 
 	composer require hydrawiki/lessoid
 
-Without composer, download the latest release from the GitHub project and place it in an appropriate place in the project.  [https://github.com/HydraWiki/lessoid/releases]
+Without composer, download the latest release from the GitHub project and place it in an appropriate place in the project.  (https://github.com/HydraWiki/lessoid/releases)
 
 ## Current Development Status
 This is alpha level code and the first target is to work seamlessly with MediaWiki.  There are various configuration settings that need to be implemented properly so it works not only seamlessly on MediaWiki, but on on frameworks as well.
@@ -41,4 +41,4 @@ This is alpha level code and the first target is to work seamlessly with MediaWi
 It is currently a really dirty shim around the default Less_Parser class from less.php designed to trick MediaWiki into using it instead of less.php.
 
 ## Other Notes
-[lessmodified]: We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environemtn.  In the future we plan to eliminate this modification and have it user upgradeable through composer.
+We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environemtn.  In the future we plan to eliminate this modification and have it user upgradeable through composer.
