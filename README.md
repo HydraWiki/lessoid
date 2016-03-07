@@ -26,6 +26,7 @@ All file includes, variables, and other required pieces are funnelled through a 
 * PHP 5.4 minimum, PHP 5.6 or higher recommend.
 * Node.js 4.x or higher, may work on earlier versions, but is untested on them.
 * A process manager service such as supervisord, god, launchctl, or otherwise.  A god configuration example is provided.
+    * Alternativly, if you don't already have a process manager service in place, [PM2](https://github.com/Unitech/pm2) is a fantastic and user friendly process manager that works great with LESSoid. 
 * Your poject's code checkout that contains all necessary LESS, CSS, and other requirements must be present on the server as the LESSoid service.
 
 
