@@ -32,13 +32,16 @@ All file includes, variables, and other required pieces are funnelled through a 
 Installation through composer into your project:
 
 	composer require hydrawiki/lessoid
+	
+Please note: This is incompatible with [oyejorge/less.php](https://github.com/oyejorge/less.php), so please make sure composer is not requiring it!
 
 Without composer, download the latest release from the GitHub project and place it in an appropriate place in the project.  (https://github.com/HydraWiki/lessoid/releases)
+
 
 ## Current Development Status
 This is alpha level code and the first target is to work seamlessly with MediaWiki.  There are various configuration settings that need to be implemented properly so it works not only seamlessly on MediaWiki, but on on frameworks as well.
 
-It is currently a really dirty shim around the default Less_Parser class from less.php designed to trick MediaWiki into using it instead of less.php.
+For MediaWiki implamentation, It currently implaments a `Less_Parser` class that mimics the [Less_Parser class from Less.php](https://github.com/oyejorge/less.php/blob/master/lib/Less/Parser.php) that MediaWiki uses by deault. It works great, but could probably be made cleaner if not having to drop directly into MediaWiki.
 
 ## Other Notes
-We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through composer.
+We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through node package manager.
