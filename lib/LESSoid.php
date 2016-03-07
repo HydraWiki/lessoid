@@ -55,7 +55,7 @@ class Less_Parser {
 	 * @param  string $uriRoot
 	 * @return array
 	 */
-	public function parseCallREST($str, $uriRoot) {
+	public function parseCallREST($str) {
 		$lessoidServer = "http://localhost";
 
 		$request = [
@@ -66,10 +66,6 @@ class Less_Parser {
 
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			$request['options']['paths'] = array_reverse(array_keys(self::$options['import_dirs']));
-		}
-
-		if (!empty($uriRoot)) {
-			$request['options']['rootpath'] = $uriRoot."/";
 		}
 
 		$request = http_build_query($request);
@@ -96,7 +92,7 @@ class Less_Parser {
 	 * @param  string $uriRoot
 	 * @return array
 	 */
-	public function parseCLI($str, $uriRoot) {
+	public function parseCLI($str) {
 		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
 		$exec = $cliPath."/lessc";
 
@@ -116,10 +112,6 @@ class Less_Parser {
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			$paths = implode(":",array_reverse(array_keys(self::$options['import_dirs'])));
 			$exec .= " --include-path=$paths";
-		}
-
-		if (!empty($uriRoot)) {
-			$exec .= " --rootpath=$uriRoot/";
 		}
 
 		$exec .= " -";
