@@ -33,10 +33,9 @@ Installation through composer into your project:
 
 	composer require hydrawiki/lessoid
 	
-Please note: This is incompatible with [oyejorge/less.php](https://github.com/oyejorge/less.php), so please make sure composer is not requiring it!
-
 Without composer, download the latest release from the GitHub project and place it in an appropriate place in the project.  (https://github.com/HydraWiki/lessoid/releases)
 
+> Please note: This is incompatible with [oyejorge/less.php](https://github.com/oyejorge/less.php), so please make sure you (or composer) are not requiring it!
 
 ## Current Development Status
 This is alpha level code and the first target is to work seamlessly with MediaWiki.  There are various configuration settings that need to be implemented properly so it works not only seamlessly on MediaWiki, but on on frameworks as well.
