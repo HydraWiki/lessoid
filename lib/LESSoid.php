@@ -2,7 +2,7 @@
 /**
  *  RESToid shim based around MediaWiki's calling of Less_Parser
  */
-class Less_Parser{
+class Less_Parser {
 
 	public static $default_options = array(
 		'compress'				=> false,			// option - whether to compress
@@ -26,6 +26,7 @@ class Less_Parser{
 	);
 	public static $options = array();
 	public $cssBuffer = "";
+	public $preBuffer = "";
 
 	/**
 	 * Setup Constructor
@@ -86,7 +87,7 @@ class Less_Parser{
 		if ($json) {
 			return $json;
 		} else {
-			return ["message" => "Response was not JSON","response" => $return];
+			return ["message" => "Response was not JSON", "response" => $return];
 		}
 	}
 
@@ -189,6 +190,9 @@ class Less_Parser{
 			self::$options['import_dirs'][$uriRoot] = "";
 		}
 
+		// Prepend string with preBuffer, for use with ModifyVars, ect.
+		$str = $this->preBuffer."\n\n".$str;
+
 		$time_start = microtime(true);
 		$this->cssBuffer = "/* === Start ".basename($filename)." === */\n";
 
@@ -266,7 +270,7 @@ class Less_Parser{
 		foreach($vars as $name => $value) {
 			$s .= (($name[0] === '@') ? '' : '@') . $name .': '. $value . ((substr($value,-1) === ';') ? '' : ';');
 		}
-		$this->input = $s;
+		$this->preBuffer = $s;
 		return $this;
 	}
 
