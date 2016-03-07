@@ -15,6 +15,7 @@ As for the name, we figured it matched MediaWiki's naming conventions.  Parsoid,
 * CONS
 	* Installations on shared hosts that can not run LESSoid as a service will fall back to invoking lessc from the command line.  The lessc fall back will be slower then less.php in most situations.
 
+
 ## How does it work?
 The LESSoid package presents a Less_Parser class that is compatible with the less.php class of the same name.  Existing projects should be able remove the existing less.php package and instead include lessoid package.  If there are compatibility problems [please report the issue](https://github.com/HydraWiki/lessoid/issues).
 
