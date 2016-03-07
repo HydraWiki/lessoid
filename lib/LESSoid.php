@@ -27,6 +27,7 @@ class Less_Parser {
 	public static $options = array();
 	public $cssBuffer = "";
 	public $preBuffer = "";
+	public $config;
 
 	/**
 	 * Setup Constructor
@@ -34,6 +35,21 @@ class Less_Parser {
 	 public function __construct() {
 		$this->SetOptions(Less_Parser::$default_options);
 		$this->Reset(null);
+
+		$config = parse_ini_file(__DIR__.'/config.defaults.ini');
+		if (file_exists(__DIR__."/config.ini")) {
+			$overrides = parse_ini_file(__DIR__.'/config.ini');
+			$config = array_replace($config, $overrides);
+		}
+		$this->config = $config;
+	}
+
+	public function getConfig($key) {
+		if (isset($this->config[$key])) {
+			return $this->config[$key];
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -96,10 +112,6 @@ class Less_Parser {
 		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
 		$exec = $cliPath."/lessc";
 
-		// Path to nodejs.
-		// If this is set to false, lessc will use "#!/usr/bin/env node" to try and find the node executable for you.
-		$nodeExec = "/usr/bin/node";
-
 
 		if (!file_exists($exec)) {
 			return ["message"=>"Couldn't find lessc at $exec"];
@@ -116,8 +128,12 @@ class Less_Parser {
 
 		$exec .= " -";
 
-		if ($nodeExec) {
-			$exec = $nodeExec." ".$exec;
+		if ($this->getConfig('node_override') !== false) {
+			if (is_executable($this->getConfig('node_override'))) {
+				$exec = $this->getConfig('node_override')." ".$exec;
+			} else {
+				return ["message"=>"Your configuration for node_override (".$this->getConfig('node_override').") is not executable."];
+			}
 		}
 		$descriptorspec = array(
 		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
@@ -184,8 +200,7 @@ class Less_Parser {
 			}
 		}
 		if (isset($uriRoot)) {
-			// add it too the import path too... because apparently looking right next to you is too hard, less.js...
-			// Or maybe rootpath doesn't work?
+			// add it to the import path too... because apparently looking right next to you is too hard, less.js...
 			self::$options['import_dirs'][$uriRoot] = "";
 		}
 
