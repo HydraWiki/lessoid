@@ -26,7 +26,7 @@ All file includes, variables, and other required pieces are funnelled through a 
 * PHP 5.4 minimum, PHP 5.6 or higher recommend.
 * Node.js 4.x or higher, may work on earlier versions, but is untested on them.
 * A process manager service such as supervisord, god, launchctl, or otherwise.  A god configuration example is provided.
-    * Alternativly, if you don't already have a process manager service in place, [PM2](https://github.com/Unitech/pm2) is a fantastic and user friendly process manager that works great with LESSoid. 
+    * Alternativly, if you don't already have a process manager service in place, [PM2](https://github.com/Unitech/pm2) is a fantastic and user friendly process manager that works great with LESSoid.
 * Your poject's code checkout that contains all necessary LESS, CSS, and other requirements must be present on the server as the LESSoid service.
 
 
@@ -34,10 +34,19 @@ All file includes, variables, and other required pieces are funnelled through a 
 Installation through composer into your project:
 
 	composer require hydrawiki/lessoid
-	
+
 Without composer, download the latest release from the GitHub project and place it in an appropriate place in the project.  (https://github.com/HydraWiki/lessoid/releases)
 
 > Please note: This is incompatible with [oyejorge/less.php](https://github.com/oyejorge/less.php), so please make sure you (or composer) are not requiring it!
+
+## Configuration
+There are multiple places in code where some configuration can be made.
+We have not yet come up with a unified configuration file on the PHP side, so for now here are some basic tips of things you may need to change.
+
+* In `lib/LESSoid.php` in the `parseCLI()` method, there is a variable called `$nodeExec`. By default it is defined as `$nodeExec = "/usr/bin/node";`. If your nodejs executable lives somewhere else, you will need to change this variable.
+    * If set to false, it will call lessc directly, tho we ran into issues with lessc's shebang (`#!/usr/bin/env node`) not properly finding nodejs in some enviroments.
+* In `services/lessoid/config.json` you will find configuration options for the LESSoid service its self. They should all mostly be pretty self explanitory at this point.
+
 
 ## Current Development Status
 This is alpha level code and the first target is to work seamlessly with MediaWiki.  There are various configuration settings that need to be implemented properly so it works not only seamlessly on MediaWiki, but on on frameworks as well.

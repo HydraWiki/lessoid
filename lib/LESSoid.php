@@ -56,8 +56,7 @@ class Less_Parser {
 	 * @return array
 	 */
 	public function parseCallREST($str, $uriRoot) {
-
-		$lessoidServer = $wgServer ? $wgServer : "http://localhost";
+		$lessoidServer = "http://localhost";
 
 		$request = [
 			"options" => [],
@@ -101,6 +100,11 @@ class Less_Parser {
 		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
 		$exec = $cliPath."/lessc";
 
+		// Path to nodejs.
+		// If this is set to false, lessc will use "#!/usr/bin/env node" to try and find the node executable for you.
+		$nodeExec = "/usr/bin/node";
+
+
 		if (!file_exists($exec)) {
 			return ["message"=>"Couldn't find lessc at $exec"];
 		}
@@ -120,6 +124,9 @@ class Less_Parser {
 
 		$exec .= " -";
 
+		if ($nodeExec) {
+			$exec = $nodeExec." ".$exec;
+		}
 		$descriptorspec = array(
 		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
 		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
