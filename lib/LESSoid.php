@@ -27,6 +27,7 @@ class Less_Parser {
 	public static $options = array();
 	public $cssBuffer = "";
 	public $preBuffer = "";
+	public $config;
 
 	/**
 	 * Setup Constructor
@@ -34,6 +35,21 @@ class Less_Parser {
 	 public function __construct() {
 		$this->SetOptions(Less_Parser::$default_options);
 		$this->Reset(null);
+
+		$config = parse_ini_file(__DIR__.'/config.defaults.ini');
+		if (file_exists(__DIR__."/config.ini")) {
+			$overrides = parse_ini_file(__DIR__.'/config.ini');
+			$config = array_replace($config, $overrides);
+		}
+		$this->config = $config;
+	}
+
+	public function getConfig($key) {
+		if (isset($this->config[$key])) {
+			return $this->config[$key];
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -55,9 +71,8 @@ class Less_Parser {
 	 * @param  string $uriRoot
 	 * @return array
 	 */
-	public function parseCallREST($str, $uriRoot) {
-
-		$lessoidServer = $wgServer ? $wgServer : "http://localhost";
+	public function parseCallREST($str) {
+		$lessoidServer = "http://localhost";
 
 		$request = [
 			"options" => [],
@@ -67,10 +82,6 @@ class Less_Parser {
 
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			$request['options']['paths'] = array_reverse(array_keys(self::$options['import_dirs']));
-		}
-
-		if (!empty($uriRoot)) {
-			$request['options']['rootpath'] = $uriRoot."/";
 		}
 
 		$request = http_build_query($request);
@@ -97,9 +108,10 @@ class Less_Parser {
 	 * @param  string $uriRoot
 	 * @return array
 	 */
-	public function parseCLI($str, $uriRoot) {
+	public function parseCLI($str) {
 		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
 		$exec = $cliPath."/lessc";
+
 
 		if (!file_exists($exec)) {
 			return ["message"=>"Couldn't find lessc at $exec"];
@@ -114,12 +126,15 @@ class Less_Parser {
 			$exec .= " --include-path=$paths";
 		}
 
-		if (!empty($uriRoot)) {
-			$exec .= " --rootpath=$uriRoot/";
-		}
-
 		$exec .= " -";
 
+		if ($this->getConfig('node_override') !== false) {
+			if (is_executable($this->getConfig('node_override'))) {
+				$exec = $this->getConfig('node_override')." ".$exec;
+			} else {
+				return ["message"=>"Your configuration for node_override (".$this->getConfig('node_override').") is not executable."];
+			}
+		}
 		$descriptorspec = array(
 		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
 		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
@@ -185,8 +200,7 @@ class Less_Parser {
 			}
 		}
 		if (isset($uriRoot)) {
-			// add it too the import path too... because apparently looking right next to you is too hard, less.js...
-			// Or maybe rootpath doesn't work?
+			// add it to the import path too... because apparently looking right next to you is too hard, less.js...
 			self::$options['import_dirs'][$uriRoot] = "";
 		}
 

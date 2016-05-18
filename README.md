@@ -13,7 +13,8 @@ As for the name, we figured it matched MediaWiki's naming conventions.  Parsoid,
 	* New Less.js releases can be implemented immediately to get new features and bug fixes.
 
 * CONS
-	* Installations on shared hosts that can not run LESSoid as a service will fall back to invoking lessc from the command line.  The lessc fall back can be as slow as less.php in some situations.
+	* Installations on shared hosts that can not run LESSoid as a service will fall back to invoking lessc from the command line.  The lessc fall back will be slower then less.php in most situations.
+
 
 ## How does it work?
 The LESSoid package presents a Less_Parser class that is compatible with the less.php class of the same name.  Existing projects should be able remove the existing less.php package and instead include lessoid package.  If there are compatibility problems [please report the issue](https://github.com/HydraWiki/lessoid/issues).
@@ -25,6 +26,7 @@ All file includes, variables, and other required pieces are funnelled through a 
 * PHP 5.4 minimum, PHP 5.6 or higher recommend.
 * Node.js 4.x or higher, may work on earlier versions, but is untested on them.
 * A process manager service such as supervisord, god, launchctl, or otherwise.  A god configuration example is provided.
+    * Alternativly, if you don't already have a process manager service in place, [PM2](https://github.com/Unitech/pm2) is a fantastic and user friendly process manager that works great with LESSoid.
 * Your poject's code checkout that contains all necessary LESS, CSS, and other requirements must be present on the server as the LESSoid service.
 
 
@@ -35,10 +37,19 @@ Installation through composer into your project:
 
 Without composer, download the latest release from the GitHub project and place it in an appropriate place in the project.  (https://github.com/HydraWiki/lessoid/releases)
 
+> Please note: This is incompatible with [oyejorge/less.php](https://github.com/oyejorge/less.php), so please make sure you (or composer) are not requiring it!
+
+## Configuration
+
+* In `lib/config.defaults.ini` you will find the configuration for the MediaWiki shim that interfaces MediaWiki with LESSoid.
+    * It's best not to modify this file, but instead create a `lib/config.ini` file and put any settings overrides in it, so that future updates won't undo your configuration changes.
+* In `services/lessoid/config.json` you will find configuration options for the LESSoid service its self. They should all mostly be pretty self explanatory at this point.
+
+
 ## Current Development Status
 This is alpha level code and the first target is to work seamlessly with MediaWiki.  There are various configuration settings that need to be implemented properly so it works not only seamlessly on MediaWiki, but on on frameworks as well.
 
-It is currently a really dirty shim around the default Less_Parser class from less.php designed to trick MediaWiki into using it instead of less.php.
+For MediaWiki implamentation, It currently implaments a `Less_Parser` class that mimics the [Less_Parser class from Less.php](https://github.com/oyejorge/less.php/blob/master/lib/Less/Parser.php) that MediaWiki uses by deault. It works great, but could probably be made cleaner if not having to drop directly into MediaWiki.
 
 ## Other Notes
-We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through composer.
+We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through node package manager.
