@@ -254,4 +254,15 @@ if (cluster.isMaster) {
     server.listen(8099, function () {
       logger(server.name+' listening at '+server.url);
     });
+
+    server.on('error',function(err){
+        if(err.code == "EADDRINUSE") {
+            if (cluster.worker.id == 1) {
+                // only throw it for the first worker or we will echo out for every single worker.
+                console.log('Another service (possibly another instance of LESSoid) is already running on port 8099.');
+            }
+            process.exit(1);
+        }
+    })
+
 }
