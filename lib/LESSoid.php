@@ -4,14 +4,14 @@
  */
 class Less_Parser {
 
-	public static $default_options = array(
+	public static $default_options = [
 		'compress'				=> false,			// option - whether to compress
 		'strictUnits'			=> false,			// whether units need to evaluate correctly
 		'strictMath'			=> false,			// whether math has to be within parenthesis
 		'relativeUrls'			=> true,			// option - whether to adjust URL's to be relative
 		'urlArgs'				=> '',				// whether to add args into url tokens
 		'numPrecision'			=> 8,
-		'import_dirs'			=> array(),
+		'import_dirs'			=> [],
 		'import_callback'		=> null,
 		'cache_dir'				=> null,
 		'cache_method'			=> 'php', 			// false, 'serialize', 'php', 'var_export', 'callback';
@@ -22,17 +22,17 @@ class Less_Parser {
 		'sourceMapWriteTo'		=> null,
 		'sourceMapURL'			=> null,
 		'indentation' 			=> '  ',
-		'plugins'				=> array(),
-	);
-	public static $options = array();
+		'plugins'				=> [],
+	];
+	public static $options = [];
 	public $cssBuffer = "";
 	public $preBuffer = "";
 	public $config;
 
 	/**
-	 * Setup Constructor
-	 */
-	 public function __construct() {
+	* Setup Constructor
+	*/
+	public function __construct() {
 		$this->SetOptions(Less_Parser::$default_options);
 		$this->Reset(null);
 
@@ -57,7 +57,7 @@ class Less_Parser {
 	 * @param $options
 	 */
 	public function Reset($options = null) {
-		$this->rules = array();
+		$this->rules = [];
 
 		if (is_array($options)) {
 			$this->SetOptions(Less_Parser::$default_options);
@@ -66,12 +66,14 @@ class Less_Parser {
 	}
 
 	/**
-	 * Use REST call to LESSoid to parse less
-	 * @param  string $str
-	 * @param  string $uriRoot
-	 * @return array
+	 * Use REST call to LESSoid to parse less.
+	 *
+	 * @access	public
+	 * @param 	string	$str
+	 * @param 	string	$uriRoot
+	 * @return	array
 	 */
-	public function parseCallREST($str) {
+	public function parseCallREST($str, $uriRoot = '') {
 		$lessoidServer = "http://localhost";
 
 		$request = [
@@ -103,22 +105,23 @@ class Less_Parser {
 	}
 
 	/**
-	 * Use the CLI to parse less
-	 * @param  string $str
-	 * @param  string $uriRoot
-	 * @return array
+	 * Use the CLI to parse less.
+	 *
+	 * @access	public
+	 * @param 	string	$str
+	 * @param 	string	$uriRoot
+	 * @return	array
 	 */
-	public function parseCLI($str) {
+	public function parseCLI($str, $uriRoot = '') {
 		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
 		$exec = $cliPath."/lessc";
 
-
 		if (!file_exists($exec)) {
-			return ["message"=>"Couldn't find lessc at $exec"];
+			return ["message" => "Couldn't find lessc at $exec"];
 		}
 
 		if (!is_executable($exec)) {
-			return ["message"=>"Lessc exists, but is not executable. Please fix your permissions."];
+			return ["message" => "Lessc exists, but is not executable. Please fix your permissions."];
 		}
 
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
@@ -128,22 +131,26 @@ class Less_Parser {
 
 		$exec .= " -";
 
-		if ($this->getConfig('node_override') !== false) {
+		if (!empty($this->getConfig('node_override'))) {
 			if (is_executable($this->getConfig('node_override'))) {
-				$exec = $this->getConfig('node_override')." ".$exec;
+				$nodeBin = $this->getConfig('node_override');
 			} else {
-				return ["message"=>"Your configuration for node_override (".$this->getConfig('node_override').") is not executable."];
+				return ["message" => "Your configuration for node_override (".$this->getConfig('node_override').") is not executable."];
 			}
+		} else {
+			$nodeBin = 'node';
 		}
-		$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-		   2 => array("pipe", "w"),
-		);
+		$exec = $nodeBin." ".$exec;
 
-		$process = proc_open($exec, $descriptorspec, $pipes, $uriRoot, array('PATH' => '/usr/local/bin/'));
+		$descriptorspec = [
+		   0 => ["pipe", "r"],  // stdin is a pipe that the child will read from
+		   1 => ["pipe", "w"],  // stdout is a pipe that the child will write to
+		   2 => ["pipe", "w"]
+		];
+
+		$pipes = [];
+		$process = proc_open($exec, $descriptorspec, $pipes, $uriRoot, ['PATH' => '/usr/bin/:/usr/local/bin/']);
 		if (is_resource($process)) {
-
 			/* write LESS */
 			fwrite($pipes[0], $str);
 			fclose($pipes[0]);
@@ -153,19 +160,20 @@ class Less_Parser {
 			fclose($pipes[1]);
 
 			/* check for errors */
-			if ($stderr = stream_get_contents($pipes[2])) {
-			    return ["message"=>$stderr];
+			$stderr = stream_get_contents($pipes[2]);
+			if (!empty($stderr)) {
+			    return ["message" => $stderr];
 			}
 			fclose($pipes[2]);
 			proc_close($process);
 
 			if (!strlen($css)) {
-				return ["message"=>"No CSS Returned from lessc."];
+				return ["message" => "No CSS Returned from lessc."];
 			}
 
-			return ["css"=>$css];
+			return ["css" => $css];
 		} else {
-			return ["message"=>"Failed to start CLI lessc"];
+			return ["message" => "Failed to start CLI lessc"];
 		}
 	}
 
