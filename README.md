@@ -49,7 +49,7 @@ Without composer, download the latest release from the GitHub project and place 
 ## Current Development Status
 This is alpha level code and the first target is to work seamlessly with MediaWiki.  There are various configuration settings that need to be implemented properly so it works not only seamlessly on MediaWiki, but on on frameworks as well.
 
-For MediaWiki implamentation, It currently implaments a `Less_Parser` class that mimics the [Less_Parser class from Less.php](https://github.com/oyejorge/less.php/blob/master/lib/Less/Parser.php) that MediaWiki uses by deault. It works great, but could probably be made cleaner if not having to drop directly into MediaWiki.
+For MediaWiki implementation, It currently implements a `Less_Parser` class that mimics the [Less_Parser class from Less.php](https://github.com/oyejorge/less.php/blob/master/lib/Less/Parser.php) that MediaWiki uses by deault. It works great, but could probably be made cleaner if not having to drop directly into MediaWiki.
 
 ## Other Notes
 We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through node package manager.

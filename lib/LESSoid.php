@@ -361,7 +361,7 @@ class Less_Parser {
 	}
 
 	/**
-	 * Catch any calls to this class that are not implamented
+	 * Catch any calls to this class that are not implemented
 	 * @param  $name      call name
 	 * @param  $arguments call arguments
 	 * @return nothing
@@ -371,7 +371,7 @@ class Less_Parser {
 	}
 
 	/**
-	 * Catch any static calls to this class that are not implamented
+	 * Catch any static calls to this class that are not implemented
 	 * @param  $name      call name
 	 * @param  $arguments call arguments
 	 * @return nothing
