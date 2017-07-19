@@ -96,7 +96,7 @@ class Less_Parser {
 		$return = curl_exec($ch);
 		curl_close($ch);
 
-		$json = json_decode($return,1);
+		$json = json_decode($return, 1);
 		if ($json) {
 			return $json;
 		} else {
@@ -123,6 +123,7 @@ class Less_Parser {
 		if (!is_executable($exec)) {
 			return ["message" => "Lessc exists, but is not executable. Please fix your permissions."];
 		}
+		$exec .= ' --no-color';
 
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			$paths = implode(":",array_reverse(array_keys(self::$options['import_dirs'])));

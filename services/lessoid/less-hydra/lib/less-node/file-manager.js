@@ -38,9 +38,7 @@ FileManager.prototype.loadFile = function(filename, currentDirectory, options, e
     if (options.paths) { paths.push.apply(paths, options.paths); }
     if (!isAbsoluteFilename && paths.indexOf('.') === -1) { paths.push('.'); }
 
-
-
-    // promise is guarenteed to be asyncronous
+    // promise is guaranteed to be asyncronous
     // which helps as it allows the file handle
     // to be closed before it continues with the next file
     return new PromiseConstructor(function(fulfill, reject) {
@@ -52,25 +50,26 @@ FileManager.prototype.loadFile = function(filename, currentDirectory, options, e
                 }
                 fs.stat(fullFilename, function (err) {
                     if (err) {
-                        if (filename.indexOf(".less") === -1) {
-                            fs.stat(fullFilename+".less", function (err) {
-                                if (err) {
-                                    filenamesTried.push(fullFilename+".less");
-                                    tryPathIndex(i + 1);
-                                } else {
-                                    fs.readFile(fullFilename+".less", 'utf-8', function(e, data) {
-                                        if (e) { reject(e); return; }
-                                        fulfill({ contents: data, filename: fullFilename+".less"});
-                                    });
-                                }
-                            });
-                        } else {
-                            filenamesTried.push(fullFilename);
-                            tryPathIndex(i + 1);
-                        }
+						if (filename.indexOf(".less") === -1) {
+						    fs.stat(fullFilename+".less", function (err) {
+						        if (err) {
+						            filenamesTried.push(fullFilename+".less");
+						            tryPathIndex(i + 1);
+						        } else {
+						            fs.readFile(fullFilename+".less", 'utf-8', function(e, data) {
+						                if (e) { reject(e); return; }
+						                fulfill({ contents: data, filename: fullFilename+".less"});
+						            });
+						        }
+						    });
+						} else {
+						    filenamesTried.push(fullFilename);
+						    tryPathIndex(i + 1);
+						}
                     } else {
                         fs.readFile(fullFilename, 'utf-8', function(e, data) {
                             if (e) { reject(e); return; }
+
                             fulfill({ contents: data, filename: fullFilename});
                         });
                     }
