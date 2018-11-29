@@ -23,8 +23,8 @@ All file includes, variables, and other required pieces are funnelled through a 
 
 
 ## Requirements
-* PHP 5.4 minimum, PHP 5.6 or higher recommend.
-* Node.js 4.x or higher, may work on earlier versions, but is untested on them.
+* PHP 7.0+
+* Node.js 4+
 * A process manager service such as supervisord, god, launchctl, or otherwise.  A god configuration example is provided.
     * Alternativly, if you don't already have a process manager service in place, [PM2](https://github.com/Unitech/pm2) is a fantastic and user friendly process manager that works great with LESSoid.
 * Your poject's code checkout that contains all necessary LESS, CSS, and other requirements must be present on the server as the LESSoid service.
@@ -52,4 +52,4 @@ This is alpha level code and the first target is to work seamlessly with MediaWi
 For MediaWiki implementation, It currently implements a `Less_Parser` class that mimics the [Less_Parser class from Less.php](https://github.com/oyejorge/less.php/blob/master/lib/Less/Parser.php) that MediaWiki uses by deault. It works great, but could probably be made cleaner if not having to drop directly into MediaWiki.
 
 ## Other Notes
-We are currently using Less.js version 2.6.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through node package manager.
+We are currently using Less.js version 3.9.0 with a small modification to make it friendlier in a MediaWiki environment.  In the future we plan to eliminate this modification and have it user upgradeable through node package manager.
