@@ -196,11 +196,11 @@ class Less_Parser {
 			$uriRoot = '';
 			$filename = 'anonymous-file-' . self::$next_id++ . '.less';
 		} else {
-			$fileUri = self::WinPath($fileUri);
+			$fileUri = $this->fixWindowsPath($fileUri);
 			$filename = $fileUri;
 			$uriRoot = dirname($fileUri);
 		}
-		$uriRoot = self::WinPath($uriRoot);
+		$uriRoot = $this->fixWindowsPath($uriRoot);
 
 		/* Lets ittorate and find any sub directories to check in the import path. */
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
@@ -270,8 +270,8 @@ class Less_Parser {
 			$uriRoot = dirname($uriRoot);
 		}
 
-		$filename = $filename ? self::WinPath(realpath($filename)) : false;
-		$uriRoot = $uriRoot ? self::WinPath($uriRoot) : '';
+		$filename = $filename ? $this->fixWindowsPath(realpath($filename)) : false;
+		$uriRoot = $uriRoot ? $this->fixWindowsPath($uriRoot) : '';
 
 		$fileContent = file_get_contents($filename);
 
@@ -321,9 +321,10 @@ class Less_Parser {
 	/**
 	 * Fix paths for Windows.
 	 *
+	 * @access private
 	 * @param type $path Fixed path.
 	 */
-	public static function WinPath($path) {
+	private function fixWindowsPath($path) {
 		return str_replace('\\', '/', $path);
 	}
 
@@ -335,12 +336,12 @@ class Less_Parser {
 	public function SetImportDirs($dirs) {
 		self::$options['import_dirs'] = [];
 		foreach ($dirs as $path => $uriRoot) {
-			$path = self::WinPath($path);
+			$path = $this->fixWindowsPath($path);
 			if (!empty($path)) {
 				$path = rtrim($path, '/') . '/';
 			}
 			if (!is_callable($uriRoot)) {
-				$uriRoot = self::WinPath($uriRoot);
+				$uriRoot = $this->fixWindowsPath($uriRoot);
 				if (!empty($uriRoot)) {
 					$uriRoot = rtrim($uriRoot, '/') . '/';
 				}
