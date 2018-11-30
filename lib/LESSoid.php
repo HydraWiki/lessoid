@@ -3,7 +3,6 @@
  *  RESToid shim based around MediaWiki's calling of Less_Parser
  */
 class Less_Parser {
-
 	public static $default_options = [
 		'compress'				=> false,			// option - whether to compress
 		'strictUnits'			=> false,			// whether units need to evaluate correctly
@@ -24,21 +23,25 @@ class Less_Parser {
 		'indentation' 			=> '  ',
 		'plugins'				=> [],
 	];
+
 	public static $options = [];
+
 	public $cssBuffer = "";
+
 	public $preBuffer = "";
+
 	public $config;
 
 	/**
-	* Setup Constructor
-	*/
+	 * Setup Constructor
+	 */
 	public function __construct() {
-		$this->SetOptions(Less_Parser::$default_options);
+		$this->SetOptions(self::$default_options);
 		$this->Reset(null);
 
-		$config = parse_ini_file(__DIR__.'/config.defaults.ini');
-		if (file_exists(__DIR__."/config.ini")) {
-			$overrides = parse_ini_file(__DIR__.'/config.ini');
+		$config = parse_ini_file(__DIR__ . '/config.defaults.ini');
+		if (file_exists(__DIR__ . "/config.ini")) {
+			$overrides = parse_ini_file(__DIR__ . '/config.ini');
 			$config = array_replace($config, $overrides);
 		}
 		$this->config = $config;
@@ -54,13 +57,14 @@ class Less_Parser {
 
 	/**
 	 * Reset Options to Default
-	 * @param $options
+	 *
+	 * @param array|null $options
 	 */
 	public function Reset($options = null) {
 		$this->rules = [];
 
 		if (is_array($options)) {
-			$this->SetOptions(Less_Parser::$default_options);
+			$this->SetOptions(self::$default_options);
 			$this->SetOptions($options);
 		}
 	}
@@ -68,10 +72,10 @@ class Less_Parser {
 	/**
 	 * Use REST call to LESSoid to parse less.
 	 *
-	 * @access	public
-	 * @param 	string	$str
-	 * @param 	string	$uriRoot
-	 * @return	array
+	 * @access public
+	 * @param string $str
+	 * @param string $uriRoot
+	 * @return array
 	 */
 	public function parseCallREST($str, $uriRoot = '') {
 		$lessoidServer = "http://localhost";
@@ -90,9 +94,9 @@ class Less_Parser {
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	    curl_setopt($ch, CURLOPT_POST, 1);
-	    curl_setopt($ch, CURLOPT_URL, $lessoidServer.":8099/parse");
-	    curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_URL, $lessoidServer . ":8099/parse");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
 		$return = curl_exec($ch);
 		curl_close($ch);
 
@@ -107,14 +111,14 @@ class Less_Parser {
 	/**
 	 * Use the CLI to parse less.
 	 *
-	 * @access	public
-	 * @param 	string	$str
-	 * @param 	string	$uriRoot
-	 * @return	array
+	 * @access public
+	 * @param string $str
+	 * @param string $uriRoot
+	 * @return array
 	 */
 	public function parseCLI($str, $uriRoot = '') {
-		$cliPath = realpath(__DIR__."/../services/lessoid/less-hydra/bin/");
-		$exec = $cliPath."/lessc";
+		$cliPath = realpath(__DIR__ . "/../services/lessoid/less-hydra/bin/");
+		$exec = $cliPath . "/lessc";
 
 		if (!file_exists($exec)) {
 			return ["message" => "Couldn't find lessc at $exec"];
@@ -126,7 +130,7 @@ class Less_Parser {
 		$exec .= ' --no-color';
 
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
-			$paths = implode(":",array_reverse(array_keys(self::$options['import_dirs'])));
+			$paths = implode(":", array_reverse(array_keys(self::$options['import_dirs'])));
 			$exec .= " --include-path=$paths";
 		}
 
@@ -136,12 +140,12 @@ class Less_Parser {
 			if (is_executable($this->getConfig('node_override'))) {
 				$nodeBin = $this->getConfig('node_override');
 			} else {
-				return ["message" => "Your configuration for node_override (".$this->getConfig('node_override').") is not executable."];
+				return ["message" => "Your configuration for node_override (" . $this->getConfig('node_override') . ") is not executable."];
 			}
 		} else {
 			$nodeBin = 'node';
 		}
-		$exec = $nodeBin." ".$exec;
+		$exec = $nodeBin . " " . $exec;
 
 		$descriptorspec = [
 		   0 => ["pipe", "r"],  // stdin is a pipe that the child will read from
@@ -163,7 +167,7 @@ class Less_Parser {
 			/* check for errors */
 			$stderr = stream_get_contents($pipes[2]);
 			if (!empty($stderr)) {
-			    return ["message" => $stderr];
+				return ["message" => $stderr];
 			}
 			fclose($pipes[2]);
 			proc_close($process);
@@ -180,8 +184,9 @@ class Less_Parser {
 
 	/**
 	 * Parse a LESS string to CSS
-	 * @param  string $str
-	 * @param  string $fileUri
+	 *
+	 * @param string $str
+	 * @param string $fileUri
 	 * @return string
 	 */
 	public function parse($str, $fileUri = '') {
@@ -189,7 +194,7 @@ class Less_Parser {
 		// gonna just leave it?
 		if (!$fileUri) {
 			$uriRoot = '';
-			$filename = 'anonymous-file-'.Less_Parser::$next_id++.'.less';
+			$filename = 'anonymous-file-' . self::$next_id++ . '.less';
 		} else {
 			$fileUri = self::WinPath($fileUri);
 			$filename = $fileUri;
@@ -201,9 +206,9 @@ class Less_Parser {
 		if (isset(self::$options['import_dirs']) && is_array(self::$options['import_dirs'])) {
 			foreach (self::$options['import_dirs'] as $path => $v) {
 				$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-				foreach($objects as $name => $object) {
+				foreach ($objects as $name => $object) {
 					if ($object->isDir() && !in_array(basename($name), ['.','..'])) {
-				    	self::$options['import_dirs'][$name."/"] = "";
+						self::$options['import_dirs'][$name . "/"] = "";
 					}
 				}
 			}
@@ -214,23 +219,23 @@ class Less_Parser {
 		}
 
 		// Prepend string with preBuffer, for use with ModifyVars, ect.
-		$str = $this->preBuffer."\n\n".$str;
+		$str = $this->preBuffer . "\n\n" . $str;
 
 		$time_start = microtime(true);
-		$this->cssBuffer = "/* === Start ".basename($filename)." === */\n";
+		$this->cssBuffer = "/* === Start " . basename($filename) . " === */\n";
 
 		// Attempt RESTfull decoding.
 		$parsed = $this->parseCallREST($str, $uriRoot);
 
 		if (!isset($parsed['css'])) {
 			// we didn't get CSS back.
-			$errmsg = isset($parsed['message']) ? $parsed['message'] : "Unknown Error. ".json_encode($parsed)."";
+			$errmsg = isset($parsed['message']) ? $parsed['message'] : "Unknown Error. " . json_encode($parsed) . "";
 			$this->cssBuffer .= "\n/* No CSS Returned from REST Decoding! \n $errmsg */\n";
 
 			// Lets fallback to the CLI, the service may be down.
 			$parsedCli = $this->parseCLI($str, $uriRoot);
 			if (!isset($parsedCli['css'])) {
-				$errmsg = isset($parsedCli['message']) ? $parsedCli['message'] : "Unknown Error ".json_encode($parsedCli)."";
+				$errmsg = isset($parsedCli['message']) ? $parsedCli['message'] : "Unknown Error " . json_encode($parsedCli) . "";
 				$this->cssBuffer .= "\n/* No CSS Returned from CLI Decoding! \n $errmsg */\n";
 			} else {
 				// Add parsed CSS to the buffer.
@@ -242,10 +247,9 @@ class Less_Parser {
 		}
 
 		$time_end = microtime(true);
-		$this->cssBuffer .= "\n/* === End ".basename($filename)." (compiled in ".round($time_end - $time_start,2)." seconds.) === */";
+		$this->cssBuffer .= "\n/* === End " . basename($filename) . " (compiled in " . round($time_end - $time_start, 2) . " seconds.) === */";
 		return $this;
 	}
-
 
 	/**
 	 * Parse a Less string from a given file
@@ -298,8 +302,9 @@ class Less_Parser {
 	}
 
 	/**
-	 * [WinPath description]
-	 * @param [type] $path [description]
+	 * Fix paths for Windows.
+	 *
+	 * @param type $path Fixed path.
 	 */
 	public static function WinPath($path) {
 		return str_replace('\\', '/', $path);
@@ -307,53 +312,57 @@ class Less_Parser {
 
 	/**
 	 * Set a list of directories or callbacks the parser should use for determining import paths
+	 *
 	 * @param array $dirs
 	 */
 	public function SetImportDirs($dirs) {
-		Less_Parser::$options['import_dirs'] = array();
-		foreach($dirs as $path => $uriRoot) {
+		self::$options['import_dirs'] = [];
+		foreach ($dirs as $path => $uriRoot) {
 			$path = self::WinPath($path);
 			if (!empty($path)) {
-				$path = rtrim($path,'/').'/';
+				$path = rtrim($path, '/') . '/';
 			}
 			if (!is_callable($uriRoot)) {
 				$uriRoot = self::WinPath($uriRoot);
 				if (!empty($uriRoot)) {
-					$uriRoot = rtrim($uriRoot,'/').'/';
+					$uriRoot = rtrim($uriRoot, '/') . '/';
 				}
 			}
-			Less_Parser::$options['import_dirs'][$path] = $uriRoot;
+			self::$options['import_dirs'][$path] = $uriRoot;
 		}
 	}
 
 	/**
 	 * Set Multiple Options
+	 *
 	 * @param array $options
 	 */
 	public function SetOptions($options) {
-		foreach($options as $option => $value) {
-			$this->SetOption($option,$value);
+		foreach ($options as $option => $value) {
+			$this->SetOption($option, $value);
 		}
 	}
 
 	/**
 	 * Set Option
+	 *
 	 * @param string $option
 	 * @param string $value
 	 */
-	public function SetOption($option,$value) {
-		switch($option) {
+	public function SetOption($option, $value) {
+		switch ($option) {
 			case 'import_dirs':
 				$this->SetImportDirs($value);
 			return;
 		}
-		Less_Parser::$options[$option] = $value;
+		self::$options[$option] = $value;
 	}
 
 	/**
 	 * Shim to feed back empty array.
 	 * No actual idea what mediawiki is doing with this file list, but it doesn't need it
 	 * as far as im concerned. Tho when code expects arrays, give it arrays.
+	 *
 	 * @return array [an empty one!]
 	 */
 	public function AllParsedFiles() {
@@ -362,23 +371,21 @@ class Less_Parser {
 
 	/**
 	 * Catch any calls to this class that are not implemented
-	 * @param  $name      call name
-	 * @param  $arguments call arguments
+	 *
+	 * @param mixed $name call name
+	 * @param mixed $arguments call arguments
 	 * @return nothing
 	 */
 	public function __call($name, $arguments) {
-	  	return;
 	}
 
 	/**
 	 * Catch any static calls to this class that are not implemented
-	 * @param  $name      call name
-	 * @param  $arguments call arguments
+	 *
+	 * @param mixed $name call name
+	 * @param mixed $arguments call arguments
 	 * @return nothing
 	 */
 	public static function __callStatic($name, $arguments) {
-		return;
 	}
-
-
 }
