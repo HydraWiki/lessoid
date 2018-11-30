@@ -294,11 +294,28 @@ class Less_Parser {
 	 */
 	public function ModifyVars($vars) {
 		$s = '';
-		foreach($vars as $name => $value) {
-			$s .= (($name[0] === '@') ? '' : '@') . $name .': '. $value . ((substr($value,-1) === ';') ? '' : ';');
+		foreach ($vars as $name => $value) {
+			$value = $this->fixVar($value);
+			$s .= '@' . ltrim($name, '@') . ': ' . $value . ';';
 		}
 		$this->preBuffer = $s;
 		return $this;
+	}
+
+	/**
+	 * Fix variables to be suitable for Less.
+	 * Example: Booleans have to be the string true or false.
+	 *
+	 * @access private
+	 * @param mixed $variable
+	 * @return mixed
+	 */
+	private function fixVar($variable) {
+		if (is_bool($variable)) {
+			$variable = $variable ? 'true' : 'false';
+		}
+		$variable = rtrim($variable, ';');
+		return $variable;
 	}
 
 	/**
