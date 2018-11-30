@@ -33,6 +33,14 @@ class Less_Parser {
 	public $config;
 
 	/**
+	 * Next file ID iterator.
+	 * This is static so that separate instances of this class do not clash.
+	 *
+	 * @var integer
+	 */
+	private static $nextFileId = 0;
+
+	/**
 	 * Setup Constructor
 	 */
 	public function __construct() {
@@ -183,7 +191,7 @@ class Less_Parser {
 	}
 
 	/**
-	 * Parse a LESS string to CSS
+	 * Parse a LESS string to CSS.
 	 *
 	 * @param string $str
 	 * @param string $fileUri
@@ -194,7 +202,7 @@ class Less_Parser {
 		// gonna just leave it?
 		if (!$fileUri) {
 			$uriRoot = '';
-			$filename = 'anonymous-file-' . self::$next_id++ . '.less';
+			$filename = 'anonymous-file-' . self::$nextFileId++ . '.less';
 		} else {
 			$fileUri = $this->fixWindowsPath($fileUri);
 			$filename = $fileUri;
