@@ -17,7 +17,10 @@ abstractFileManager.prototype.getPath = function (filename) {
 };
 
 abstractFileManager.prototype.tryAppendExtension = function(path, ext) {
-    return /(\.[a-z]*$)|([\?;].*)$/.test(path) ? path : path + ext;
+	if (path.lastIndexOf(ext) != path.length - ext.length) {
+		return path + ext;
+	}
+    return path;
 };
 
 abstractFileManager.prototype.tryAppendLessExtension = function(path) {
